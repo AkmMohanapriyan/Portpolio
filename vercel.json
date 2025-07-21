@@ -11,8 +11,17 @@
   ],
   "routes": [
     {
+      "src": "/api/(.*)",
+      "dest": "Back-End/server.js",
+      "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+    },
+    {
+      "src": "/",
+      "dest": "Front-End/dist/index.html"
+    },
+    {
       "src": "/(.*)",
-      "dest": "Back-End/server.js"
+      "dest": "Front-End/dist/$1"
     }
   ]
 }

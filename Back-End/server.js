@@ -8,23 +8,42 @@ dotenv.config();
 
 const app = express();
 
+// const allowedOrigins = [
+//   'http://localhost:5173',
+//   'https://kirushnarmohanapriyan-cy6pwg79j-akm-mohanapriyans-projects.vercel.app',
+//   'https://kirushnarmohanapriyan.vercel.app' // Add your production domain
+// ];
+
 const allowedOrigins = [
   'http://localhost:5173',
-  'https://kirushnarmohanapriyan-cy6pwg79j-akm-mohanapriyans-projects.vercel.app',
-  'https://kirushnarmohanapriyan.vercel.app' // Add your production domain
+  'https://kirushnarmohanapriyan.vercel.app',
+  'https://kirushnarmohanapriyan-*.vercel.app' // Wildcard for preview deployments
 ];
 
 // Enhanced Middleware Configuration
+// app.use(cors({
+//   origin: function (origin, callback) {
+//     // Allow requests with no origin (like mobile apps or curl requests)
+//     if (!origin) return callback(null, true);
+    
+//     if (allowedOrigins.indexOf(origin) === -1) {
+//       const msg = `The CORS policy for this site does not allow access from the specified Origin: ${origin}`;
+//       return callback(new Error(msg), false);
+//     }
+//     return callback(null, true);
+//   },
+//   credentials: true,
+//   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+//   allowedHeaders: ['Content-Type', 'Authorization']
+// }));
+
 app.use(cors({
   origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
-    
-    if (allowedOrigins.indexOf(origin) === -1) {
-      const msg = `The CORS policy for this site does not allow access from the specified Origin: ${origin}`;
-      return callback(new Error(msg), false);
+    if (!origin || allowedOrigins.some(allowed => origin.startsWith(allowed))) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
     }
-    return callback(null, true);
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
