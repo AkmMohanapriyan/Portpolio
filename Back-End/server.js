@@ -103,13 +103,112 @@ app.post('/api/contact', async (req, res) => {
     console.log('Contact saved to DB');
 
     // Email templates
-    const adminMail = {
-      from: process.env.EMAIL_USER,
-      to: process.env.ADMIN_EMAIL || process.env.EMAIL_USER,
-      subject: `New Contact: ${subject || 'No Subject'}`,
-      text: `Name: ${name}\nEmail: ${email}\nMessage: ${message}`,
-      html: `<p><strong>Name:</strong> ${name}<br><strong>Email:</strong> ${email}<br><strong>Message:</strong> ${message}</p>`
-    };
+const adminMail = {
+  from: `"Portfolio Contact Form" <${process.env.EMAIL_USER}>`,
+  to: process.env.ADMIN_EMAIL || process.env.EMAIL_USER,
+  subject: `📩 New Contact Form Submission: ${subject || 'No Subject Provided'}`,
+  text: `
+NEW CONTACT FORM SUBMISSION
+
+Contact Details:
+----------------
+Name: ${name}
+Email: ${email}
+Subject: ${subject || 'No subject provided'}
+Submission Time: ${new Date().toLocaleString()}
+
+Message Content:
+----------------
+${message}
+
+Additional Information:
+----------------------
+IP Address: ${req.ip}
+User Agent: ${req.headers['user-agent']}
+
+Action Required:
+---------------
+Please respond to this inquiry within 24-48 hours.
+
+Quick Actions:
+- Reply to sender: ${email}
+- View full submission details in database
+  `,
+  html: `
+<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
+  <h2 style="color: #2d3748; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px;">
+    📩 New Contact Form Submission
+  </h2>
+  
+  <div style="background: #f8fafc; padding: 16px; border-radius: 4px; margin-bottom: 20px;">
+    <h3 style="margin-top: 0; color: #2d3748;">Contact Details</h3>
+    <table style="width: 100%;">
+      <tr>
+        <td style="width: 100px; padding: 4px 0; font-weight: bold;">Name:</td>
+        <td style="padding: 4px 0;">${name}</td>
+      </tr>
+      <tr>
+        <td style="padding: 4px 0; font-weight: bold;">Email:</td>
+        <td style="padding: 4px 0;">
+          <a href="mailto:${email}" style="color: #3182ce; text-decoration: none;">${email}</a>
+        </td>
+      </tr>
+      <tr>
+        <td style="padding: 4px 0; font-weight: bold;">Subject:</td>
+        <td style="padding: 4px 0;">${subject || 'No subject provided'}</td>
+      </tr>
+      <tr>
+        <td style="padding: 4px 0; font-weight: bold;">Submitted:</td>
+        <td style="padding: 4px 0;">${new Date().toLocaleString()}</td>
+      </tr>
+    </table>
+  </div>
+
+  <div style="margin-bottom: 20px;">
+    <h3 style="color: #2d3748;">Message Content</h3>
+    <div style="background: #fff; border: 1px solid #e2e8f0; border-radius: 4px; padding: 12px; white-space: pre-wrap;">
+      ${message}
+    </div>
+  </div>
+
+  <div style="background: #f0f9ff; padding: 16px; border-radius: 4px; border-left: 4px solid #3182ce; margin-bottom: 20px;">
+    <h3 style="margin-top: 0; color: #2d3748;">Technical Details</h3>
+    <table style="width: 100%; font-size: 14px;">
+      <tr>
+        <td style="padding: 4px 0; font-weight: bold;">IP Address:</td>
+        <td style="padding: 4px 0;">${req.ip}</td>
+      </tr>
+      <tr>
+        <td style="padding: 4px 0; font-weight: bold;">User Agent:</td>
+        <td style="padding: 4px 0;">${req.headers['user-agent']}</td>
+      </tr>
+    </table>
+  </div>
+
+  <div style="background: #ebf8ff; padding: 16px; border-radius: 4px;">
+    <h3 style="margin-top: 0; color: #2d3748;">Quick Actions</h3>
+    <ul style="padding-left: 20px; margin-bottom: 0;">
+      <li style="margin-bottom: 8px;">
+        <a href="mailto:${email}?subject=Re: ${encodeURIComponent(subject || 'Your inquiry')}" 
+           style="color: #3182ce; text-decoration: none; font-weight: bold;">
+          ✉️ Reply to sender
+        </a>
+      </li>
+      <li style="margin-bottom: 8px;">
+        <a href="https://admin.yourportfolio.com/submissions" 
+           style="color: #3182ce; text-decoration: none; font-weight: bold;">
+          📊 View all submissions
+        </a>
+      </li>
+      <li>
+        <span style="font-weight: bold;">⏰ Response Due:</span> 
+        ${new Date(Date.now() + 48 * 60 * 60 * 1000).toLocaleDateString()}
+      </li>
+    </ul>
+  </div>
+</div>
+  `
+};
 
 const userMail = {
   from: `"Kirushnar Mohanapriyan" <${process.env.EMAIL_USER}>`,
@@ -159,7 +258,7 @@ Email: mohanapriyanpriyan4@gmail.com
 
   <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid #e2e8f0;">
     <p>Warm regards,</p>
-    <p style="font-weight: bold; margin: 8px 0;">Kirushnar Mohanapriyan</p>
+    <p style="font-weight: bold; margin: 8px 0;">Kirushnar Mohanapriyan - Akm</p>
     <p style="margin: 4px 0; color: #4a5568;">Full Stack Developer | UI/UX Designer</p>
     <p style="margin: 4px 0;"><a href="tel:+94761989195" style="color: #4299e1; text-decoration: none;">+94 761 989 195</a></p>
     <p style="margin: 4px 0;"><a href="mailto:mohanapriyanpriyan4@gmail.com" style="color: #4299e1; text-decoration: none;">mohanapriyanpriyan4@gmail.com</a></p>
