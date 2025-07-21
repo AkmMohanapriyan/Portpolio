@@ -111,13 +111,62 @@ app.post('/api/contact', async (req, res) => {
       html: `<p><strong>Name:</strong> ${name}<br><strong>Email:</strong> ${email}<br><strong>Message:</strong> ${message}</p>`
     };
 
-    const userMail = {
-      from: process.env.EMAIL_USER,
-      to: email,
-      subject: 'Thank you for contacting us',
-      text: `Dear ${name},\n\nWe've received your message and will respond shortly.`,
-      html: `<p>Dear ${name},<br><br>We've received your message and will respond shortly.</p>`
-    };
+const userMail = {
+  from: `"Kirushnar Mohanapriyan" <${process.env.EMAIL_USER}>`,
+  to: email,
+  subject: 'Thank You for Contacting Me - Message Received',
+  text: `
+Dear ${name},
+
+Thank you for reaching out through my contact form. I wanted to personally acknowledge that I've received your message:
+
+Subject: ${subject || 'No subject provided'}
+Message: ${message}
+
+I typically respond to inquiries within 24-48 hours. If your matter requires urgent attention, please don't hesitate to contact me directly at +94 761 989 195.
+
+In the meantime, you might find these resources helpful:
+- My portfolio: https://kirushnarmohanapriyan.vercel.app
+- My GitHub: https://github.com/AkmMohanapriyan
+- LinkedIn: https://www.linkedin.com/in/kirushnar-mohanapriyan-120a38357/
+
+Warm regards,
+Kirushnar Mohanapriyan
+Full Stack Developer | UI/UX Designer
+Phone: +94 761 989 195
+Email: mohanapriyanpriyan4@gmail.com
+  `,
+  html: `
+<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+  <h2 style="color: #2d3748;">Dear ${name},</h2>
+  
+  <p>Thank you for reaching out through my contact form. I wanted to personally acknowledge that I've received your message:</p>
+  
+  <div style="background: #f7fafc; padding: 16px; border-left: 4px solid #4299e1; margin: 16px 0;">
+    <p style="margin: 0;"><strong>Subject:</strong> ${subject || 'No subject provided'}</p>
+    <p style="margin: 8px 0 0 0;"><strong>Message:</strong></p>
+    <p style="white-space: pre-wrap; margin: 8px 0 0 0;">${message}</p>
+  </div>
+
+  <p>I typically respond to inquiries within <strong>24-48 hours</strong>. If your matter requires urgent attention, please don't hesitate to contact me directly at <a href="tel:+94761989195">+94 761 989 195</a>.</p>
+
+  <p>In the meantime, you might find these resources helpful:</p>
+  <ul>
+    <li><a href="https://kirushnarmohanapriyan.vercel.app" style="color: #4299e1; text-decoration: none;">My Portfolio</a></li>
+    <li><a href="https://github.com/AkmMohanapriyan" style="color: #4299e1; text-decoration: none;">My GitHub Profile</a></li>
+    <li><a href="https://www.linkedin.com/in/kirushnar-mohanapriyan-120a38357/" style="color: #4299e1; text-decoration: none;">My LinkedIn Profile</a></li>
+  </ul>
+
+  <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid #e2e8f0;">
+    <p>Warm regards,</p>
+    <p style="font-weight: bold; margin: 8px 0;">Kirushnar Mohanapriyan</p>
+    <p style="margin: 4px 0; color: #4a5568;">Full Stack Developer | UI/UX Designer</p>
+    <p style="margin: 4px 0;"><a href="tel:+94761989195" style="color: #4299e1; text-decoration: none;">+94 761 989 195</a></p>
+    <p style="margin: 4px 0;"><a href="mailto:mohanapriyanpriyan4@gmail.com" style="color: #4299e1; text-decoration: none;">mohanapriyanpriyan4@gmail.com</a></p>
+  </div>
+</div>
+  `
+};
 
     // Send emails
     await transporter.sendMail(adminMail);
