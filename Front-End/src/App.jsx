@@ -44,48 +44,98 @@ const Portfolio = () => {
     });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsSubmitting(true);
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+  //   setIsSubmitting(true);
 
-    try {
-      const response = await fetch('http://localhost:5000/api/contact', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
+  //   try {
+  //     const response = await fetch('http://localhost:5000/api/contact', {
+  //       method: 'POST',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //       body: JSON.stringify(formData),
+  //     });
 
-      // First check if the response is JSON
-      const contentType = response.headers.get('content-type');
-      let data;
+  //     // First check if the response is JSON
+  //     const contentType = response.headers.get('content-type');
+  //     let data;
 
-      if (contentType && contentType.includes('application/json')) {
-        data = await response.json();
-      } else {
-        const text = await response.text();
-        throw new Error(`Unexpected response: ${text.substring(0, 100)}`);
-      }
+  //     if (contentType && contentType.includes('application/json')) {
+  //       data = await response.json();
+  //     } else {
+  //       const text = await response.text();
+  //       throw new Error(`Unexpected response: ${text.substring(0, 100)}`);
+  //     }
 
-      if (!response.ok) {
-        throw new Error(data.message || 'Request failed');
-      }
+  //     if (!response.ok) {
+  //       throw new Error(data.message || 'Request failed');
+  //     }
 
-      toast.success(data.message);
-      setFormData({
-        name: '',
-        email: '',
-        subject: '',
-        message: ''
-      });
-    } catch (error) {
-      toast.error(error.message || 'Failed to send message');
-      console.error('Error:', error);
-    } finally {
-      setIsSubmitting(false);
+  //     toast.success(data.message);
+  //     setFormData({
+  //       name: '',
+  //       email: '',
+  //       subject: '',
+  //       message: ''
+  //     });
+  //   } catch (error) {
+  //     toast.error(error.message || 'Failed to send message');
+  //     console.error('Error:', error);
+  //   } finally {
+  //     setIsSubmitting(false);
+  //   }
+  // };
+
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setIsSubmitting(true);
+
+  try {
+    // Use relative path for production, absolute for development
+    const apiUrl = process.env.NODE_ENV === 'production' 
+      ? '/api/contact' 
+      : 'http://localhost:5000/api/contact';
+
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(formData),
+      credentials: 'include' // Only if you need to send cookies
+    });
+
+    // First check if the response is JSON
+    const contentType = response.headers.get('content-type');
+    let data;
+
+    if (contentType && contentType.includes('application/json')) {
+      data = await response.json();
+    } else {
+      const text = await response.text();
+      throw new Error(`Unexpected response: ${text.substring(0, 100)}`);
     }
-  };
+
+    if (!response.ok) {
+      throw new Error(data.message || 'Request failed');
+    }
+
+    toast.success(data.message);
+    setFormData({
+      name: '',
+      email: '',
+      subject: '',
+      message: ''
+    });
+  } catch (error) {
+    toast.error(error.message || 'Failed to send message');
+    console.error('Error:', error);
+  } finally {
+    setIsSubmitting(false);
+  }
+};
+
 
   useEffect(() => {
     // Set current year in footer
