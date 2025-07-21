@@ -59,13 +59,27 @@ const Portfolio = () => {
 // });
 
 
-const response = await fetch('https://kirushnarmohanapriyan.vercel.app/api/contact', {
+// const response = await fetch('https://kirushnarmohanapriyan.vercel.app/api/contact', {
+//   method: 'POST',
+//   headers: {
+//     'Content-Type': 'application/json',
+//     'Accept': 'application/json'
+//   },
+//   body: JSON.stringify(formData)
+// });
+
+
+const response = await fetch('https://your-backend-domain.vercel.app/api/contact', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
+    'Accept': 'application/json'
   },
   body: JSON.stringify(formData)
 });
+
+
+
       // First check if the response is JSON
       const contentType = response.headers.get('content-type');
       let data;
