@@ -1,6 +1,3 @@
-
-
-
 {
   "name": "portfolio-backend",
   "version": "1.0.0",
@@ -8,7 +5,8 @@
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "echo \"Building...\" && exit 0"
   },
   "dependencies": {
     "cors": "^2.8.5",
@@ -19,5 +17,35 @@
   },
   "devDependencies": {
     "nodemon": "^3.0.2"
+  },
+  "vercel": {
+    "version": 2,
+    "builds": [
+      {
+        "src": "Back-End/server.js",
+        "use": "@vercel/node",
+        "config": {
+          "includeFiles": [
+            "Back-End/**/*.js",
+            "Back-End/**/*.json"
+          ]
+        }
+      }
+    ],
+    "routes": [
+      {
+        "src": "/api/(.*)",
+        "dest": "Back-End/server.js",
+        "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+      },
+      {
+        "src": "/(.*)",
+        "dest": "Back-End/server.js",
+        "methods": ["GET"]
+      }
+    ]
+  },
+  "engines": {
+    "node": ">=16.0.0"
   }
 }
