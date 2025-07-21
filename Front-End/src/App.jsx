@@ -92,11 +92,7 @@ const handleSubmit = async (e) => {
   setIsSubmitting(true);
 
   try {
-    // Determine the correct API URL
-    const isLocalhost = window.location.hostname === 'localhost' || 
-                       window.location.hostname === '127.0.0.1';
-    
-    // Use relative path in production, absolute in development
+    const isLocalhost = ['localhost', '127.0.0.1'].includes(window.location.hostname);
     const apiUrl = isLocalhost 
       ? 'http://localhost:5000/api/contact' 
       : '/api/contact';
@@ -107,12 +103,11 @@ const handleSubmit = async (e) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(formData),
-      credentials: 'include' // Only if you need cookies
     });
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+      throw new Error(errorData.message || `HTTP error! Status: ${response.status}`);
     }
 
     const data = await response.json();
@@ -124,8 +119,8 @@ const handleSubmit = async (e) => {
       message: ''
     });
   } catch (error) {
+    console.error('Submission error:', error);
     toast.error(error.message || 'Failed to send message');
-    console.error('Error:', error);
   } finally {
     setIsSubmitting(false);
   }

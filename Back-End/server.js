@@ -8,260 +8,151 @@ dotenv.config();
 
 const app = express();
 
-// Enhanced Middleware Configuration
+// Enhanced CORS Configuration
 const allowedOrigins = [
   'http://localhost:5173',
   'http://localhost:5174',
   'https://kirushnarmohanapriyan.vercel.app',
-  'https://kirushnarmohanapriyan-*.vercel.app', // Wildcard for all preview deployments
-  'https://kirushnarmohanapriyan-git-*.vercel.app' // For Git branch deployments
+  'https://kirushnarmohanapriyan-*.vercel.app',
+  'https://kirushnarmohanapriyan-git-*.vercel.app'
 ];
 
-app.use(cors({
-  origin: function (origin, callback) {
+const corsOptions = {
+  origin: (origin, callback) => {
     if (!origin) return callback(null, true);
     
-    // Check against allowed origins with wildcard support
-    const originAllowed = allowedOrigins.some(allowed => {
+    const isAllowed = allowedOrigins.some(allowed => {
       if (allowed.includes('*')) {
-        const regex = new RegExp('^' + allowed.replace(/\*/g, '.*') + '$');
+        const regex = new RegExp(`^${allowed.replace(/\*/g, '.*')}$`);
         return regex.test(origin);
       }
       return origin === allowed;
     });
     
-    if (originAllowed) {
-      return callback(null, true);
-    }
-    
-    return callback(new Error('Not allowed by CORS'));
+    isAllowed 
+      ? callback(null, true)
+      : callback(new Error('Not allowed by CORS'));
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
-}));
+};
 
-// Handle preflight requests
-app.options('*', cors());
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 
-
-
+// Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // MongoDB Connection
 const connectDB = async () => {
-    try {
-        await mongoose.connect(process.env.MONGODB_URI);
-        console.log('MongoDB connected successfully');
-    } catch (error) {
-        console.error('MongoDB connection error:', error.message);
-        process.exit(1);
-    }
+  try {
+    await mongoose.connect(process.env.MONGODB_URI);
+    console.log('MongoDB connected successfully');
+  } catch (error) {
+    console.error('MongoDB connection error:', error.message);
+    process.exit(1);
+  }
 };
 
-connectDB();
+await connectDB();
 
-// Contact Message Schema
+// Contact Schema
 const contactSchema = new mongoose.Schema({
-    name: { type: String, required: true },
-    email: { type: String, required: true },
-    subject: { type: String },
-    message: { type: String, required: true },
-    createdAt: { type: Date, default: Date.now }
+  name: { type: String, required: true },
+  email: { type: String, required: true },
+  subject: { type: String },
+  message: { type: String, required: true },
+  createdAt: { type: Date, default: Date.now }
 });
 
 const Contact = mongoose.model('Contact', contactSchema);
 
-// Nodemailer transporter setup
+// Nodemailer Setup
 const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-    },
+  service: 'gmail',
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS
+  }
 });
 
-// Enhanced Contact Form Endpoint with CORS headers
-// app.post('/api/contact', async (req, res) => {
-//     try {
-//         const { name, email, subject, message } = req.body;
-
-//         // Validate input
-//         if (!name || !email || !message) {
-//             return res.status(400).json({
-//                 success: false,
-//                 message: 'Please fill in all required fields'
-//             });
-//         }
-
-//         // Save to database
-//         const newContact = new Contact({ name, email, subject, message });
-//         await newContact.save();
-
-//         // Email options for admin notification
-//         const adminMailOptions = {
-//             from: process.env.EMAIL_USER,
-//             to: process.env.ADMIN_EMAIL || process.env.EMAIL_USER, // Fallback to sender if ADMIN_EMAIL not set
-//             subject: `New Contact Form Submission: ${subject || 'No Subject'}`,
-//             text: `
-//         You have a new contact form submission:
-        
-//         Name: ${name}
-//         Email: ${email}
-//         Subject: ${subject || 'Not specified'}
-//         Message: ${message}
-        
-//         Received at: ${new Date().toLocaleString()}
-//       `,
-//             html: `
-//         <h2>New Contact Form Submission</h2>
-//         <p><strong>Name:</strong> ${name}</p>
-//         <p><strong>Email:</strong> ${email}</p>
-//         <p><strong>Subject:</strong> ${subject || 'Not specified'}</p>
-//         <p><strong>Message:</strong></p>
-//         <p>${message.replace(/\n/g, '<br>')}</p>
-//         <p><em>Received at: ${new Date().toLocaleString()}</em></p>
-//       `
-//         };
-
-//         // Email options for user confirmation
-//         const userMailOptions = {
-//             from: process.env.EMAIL_USER,
-//             to: email,
-//             subject: 'Thank you for contacting us',
-//             text: `Dear ${name},\n\nThank you for your message. We have received your inquiry and will get back to you shortly.\n\nBest regards,\n${process.env.COMPANY_NAME || 'Our Team'}`,
-//             html: `
-//         <h2>Thank you for contacting us</h2>
-//         <p>Dear ${name},</p>
-//         <p>Thank you for your message. We have received your inquiry and will get back to you shortly.</p>
-//         <p>Best regards,<br>${process.env.COMPANY_NAME || 'Our Team'}</p>
-//       `
-//         };
-
-//         // Send both emails
-//         await transporter.sendMail(adminMailOptions);
-//         await transporter.sendMail(userMailOptions);
-
-//         res.status(200).json({
-//             success: true,
-//             message: 'Message sent successfully!'
-//         });
-
-//     } catch (error) {
-//         console.error('Error processing contact form:', error);
-
-//         // Differentiate between validation errors and server errors
-//         if (error.name === 'ValidationError') {
-//             return res.status(400).json({
-//                 success: false,
-//                 message: error.message
-//             });
-//         }
-
-//         res.status(500).json({
-//             success: false,
-//             message: 'Server error. Please try again later.'
-//         });
-//     }
-// });
-
-// Enhanced Contact Form Endpoint with CORS headers and improved logging
+// API Endpoint with Enhanced Logging
 app.post('/api/contact', async (req, res) => {
-    try {
-        console.log('Received contact form submission:', req.body);
-        
-        const { name, email, subject, message } = req.body;
+  try {
+    console.log('Incoming request:', req.method, req.url);
+    console.log('Request body:', req.body);
 
-        // Validate input
-        if (!name || !email || !message) {
-            console.log('Validation failed - missing required fields');
-            return res.status(400).json({
-                success: false,
-                message: 'Please fill in all required fields'
-            });
-        }
+    const { name, email, subject, message } = req.body;
 
-        // Save to database
-        console.log('Saving contact to database...');
-        const newContact = new Contact({ name, email, subject, message });
-        await newContact.save();
-        console.log('Contact saved successfully');
-
-        // Email options for admin notification
-        const adminMailOptions = {
-            from: process.env.EMAIL_USER,
-            to: process.env.ADMIN_EMAIL || process.env.EMAIL_USER,
-            subject: `New Contact Form Submission: ${subject || 'No Subject'}`,
-            text: `You have a new contact form submission:\n\nName: ${name}\nEmail: ${email}\nSubject: ${subject || 'Not specified'}\nMessage: ${message}\n\nReceived at: ${new Date().toLocaleString()}`,
-            html: `
-                <h2>New Contact Form Submission</h2>
-                <p><strong>Name:</strong> ${name}</p>
-                <p><strong>Email:</strong> ${email}</p>
-                <p><strong>Subject:</strong> ${subject || 'Not specified'}</p>
-                <p><strong>Message:</strong></p>
-                <p>${message.replace(/\n/g, '<br>')}</p>
-                <p><em>Received at: ${new Date().toLocaleString()}</em></p>
-            `
-        };
-
-        // Email options for user confirmation
-        const userMailOptions = {
-            from: process.env.EMAIL_USER,
-            to: email,
-            subject: 'Thank you for contacting us',
-            text: `Dear ${name},\n\nThank you for your message. We have received your inquiry and will get back to you shortly.\n\nBest regards,\n${process.env.COMPANY_NAME || 'Our Team'}`,
-            html: `
-                <h2>Thank you for contacting us</h2>
-                <p>Dear ${name},</p>
-                <p>Thank you for your message. We have received your inquiry and will get back to you shortly.</p>
-                <p>Best regards,<br>${process.env.COMPANY_NAME || 'Our Team'}</p>
-            `
-        };
-
-        // Send both emails
-        console.log('Sending emails...');
-        await transporter.sendMail(adminMailOptions);
-        await transporter.sendMail(userMailOptions);
-        console.log('Emails sent successfully');
-
-        res.status(200).json({
-            success: true,
-            message: 'Message sent successfully!'
-        });
-
-    } catch (error) {
-        console.error('Error processing contact form:', error);
-        
-        // Differentiate between validation errors and server errors
-        if (error.name === 'ValidationError') {
-            console.error('Validation error:', error.message);
-            return res.status(400).json({
-                success: false,
-                message: error.message
-            });
-        }
-
-        // Handle email sending errors specifically
-        if (error.code === 'EAUTH' || error.code === 'EENVELOPE') {
-            console.error('Email sending error:', error.message);
-            return res.status(500).json({
-                success: false,
-                message: 'Error sending confirmation email. Please try again later.'
-            });
-        }
-
-        console.error('Unexpected server error:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Server error. Please try again later.'
-        });
+    // Validation
+    if (!name || !email || !message) {
+      console.warn('Validation failed - missing fields');
+      return res.status(400).json({
+        success: false,
+        message: 'Please fill in all required fields'
+      });
     }
+
+    // Save to database
+    const newContact = new Contact({ name, email, subject, message });
+    await newContact.save();
+    console.log('Contact saved to DB');
+
+    // Email templates
+    const adminMail = {
+      from: process.env.EMAIL_USER,
+      to: process.env.ADMIN_EMAIL || process.env.EMAIL_USER,
+      subject: `New Contact: ${subject || 'No Subject'}`,
+      text: `Name: ${name}\nEmail: ${email}\nMessage: ${message}`,
+      html: `<p><strong>Name:</strong> ${name}<br><strong>Email:</strong> ${email}<br><strong>Message:</strong> ${message}</p>`
+    };
+
+    const userMail = {
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: 'Thank you for contacting us',
+      text: `Dear ${name},\n\nWe've received your message and will respond shortly.`,
+      html: `<p>Dear ${name},<br><br>We've received your message and will respond shortly.</p>`
+    };
+
+    // Send emails
+    await transporter.sendMail(adminMail);
+    await transporter.sendMail(userMail);
+    console.log('Emails sent successfully');
+
+    res.status(200).json({
+      success: true,
+      message: 'Message sent successfully!'
+    });
+
+  } catch (error) {
+    console.error('Endpoint error:', error);
+    
+    if (error.name === 'ValidationError') {
+      return res.status(400).json({
+        success: false,
+        message: error.message
+      });
+    }
+
+    res.status(500).json({
+      success: false,
+      message: 'Server error. Please try again later.'
+    });
+  }
 });
 
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+  res.status(200).json({ status: 'healthy' });
+});
 
 // Start server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
+
+export default app;
