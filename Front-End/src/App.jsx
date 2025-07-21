@@ -92,10 +92,15 @@ const handleSubmit = async (e) => {
   setIsSubmitting(true);
 
   try {
+    // Determine environment
     const isLocalhost = ['localhost', '127.0.0.1'].includes(window.location.hostname);
+    
+    // Set API URL based on environment
     const apiUrl = isLocalhost 
-      ? 'http://localhost:5000/api/contact' 
-      : '/api/contact';
+      ? 'http://localhost:5000/api/contact'  // Local development
+      : 'https://kirushnarmohanapriyan-c0a08c3ll-akm-mohanapriyans-projects.vercel.app//api/contact';  // Production
+
+    console.log('Submitting to:', apiUrl);  // Debugging log
 
     const response = await fetch(apiUrl, {
       method: 'POST',
@@ -105,22 +110,44 @@ const handleSubmit = async (e) => {
       body: JSON.stringify(formData),
     });
 
+    // Handle non-2xx responses
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.message || `HTTP error! Status: ${response.status}`);
+      let errorData;
+      try {
+        errorData = await response.json();
+      } catch (parseError) {
+        console.error('Error parsing error response:', parseError);
+        errorData = { message: await response.text() };
+      }
+      
+      throw new Error(
+        errorData.message || 
+        `Request failed with status ${response.status}: ${response.statusText}`
+      );
     }
 
+    // Handle successful response
     const data = await response.json();
-    toast.success(data.message);
+    console.log('Submission successful:', data);  // Debugging log
+    
+    toast.success(data.message || 'Message sent successfully!');
     setFormData({
       name: '',
       email: '',
       subject: '',
       message: ''
     });
+
   } catch (error) {
     console.error('Submission error:', error);
-    toast.error(error.message || 'Failed to send message');
+    
+    // User-friendly error messages
+    const errorMessage = error.message.includes('Failed to fetch')
+      ? 'Network error - could not connect to server'
+      : error.message || 'Failed to send message';
+    
+    toast.error(errorMessage);
+    
   } finally {
     setIsSubmitting(false);
   }

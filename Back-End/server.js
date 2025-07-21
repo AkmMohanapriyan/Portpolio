@@ -14,24 +14,26 @@ const allowedOrigins = [
   'http://localhost:5174',
   'https://kirushnarmohanapriyan.vercel.app',
   'https://kirushnarmohanapriyan-*.vercel.app',
-  'https://kirushnarmohanapriyan-git-*.vercel.app'
+  'https://kirushnarmohanapriyan-git-*.vercel.app',
+  'https://687d4a6e55631cb42edcd062--kirushnarmohanapriyan.netlify.app',
+  'https://kirushnarmohanapriyan.netlify.app'
 ];
 
 const corsOptions = {
-  origin: (origin, callback) => {
+  origin: function (origin, callback) {
     if (!origin) return callback(null, true);
     
-    const isAllowed = allowedOrigins.some(allowed => {
+    if (allowedOrigins.some(allowed => {
       if (allowed.includes('*')) {
         const regex = new RegExp(`^${allowed.replace(/\*/g, '.*')}$`);
         return regex.test(origin);
       }
       return origin === allowed;
-    });
+    })) {
+      return callback(null, true);
+    }
     
-    isAllowed 
-      ? callback(null, true)
-      : callback(new Error('Not allowed by CORS'));
+    return callback(new Error('Not allowed by CORS'));
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
@@ -39,7 +41,7 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.options('*', cors(corsOptions));
+app.options('*', cors(corsOptions)); // Enable preflight for all routes
 
 // Middleware
 app.use(express.json());
