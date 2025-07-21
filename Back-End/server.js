@@ -8,22 +8,10 @@ dotenv.config();
 
 const app = express();
 
-// const allowedOrigins = [
-//   'http://localhost:5173',
-//   'https://kirushnarmohanapriyan-cy6pwg79j-akm-mohanapriyans-projects.vercel.app',
-//   'https://kirushnarmohanapriyan.vercel.app' // Add your production domain
-// ];
-
-// const allowedOrigins = [
-//   'http://localhost:5173',
-//   'https://kirushnarmohanapriyan.vercel.app',
-//   'https://kirushnarmohanapriyan-*.vercel.app' // Wildcard for preview deployments
-// ];
-
 const allowedOrigins = [
-  'http://localhost:5173', // Your local dev frontend
-  'https://kirushnarmohanapriyan.netlify.app', // Your production frontend
-  'https://687d4a6e55631cb42edcd062--kirushnarmohanapriyan.netlify.app' // Your Netlify preview URL
+  'http://localhost:5173',
+  'https://kirushnarmohanapriyan-cy6pwg79j-akm-mohanapriyans-projects.vercel.app',
+  'https://kirushnarmohanapriyan.vercel.app' // Add your production domain
 ];
 
 // Enhanced Middleware Configuration
@@ -43,35 +31,17 @@ const allowedOrigins = [
 //   allowedHeaders: ['Content-Type', 'Authorization']
 // }));
 
-// app.use(cors({
-//   origin: function (origin, callback) {
-//     if (!origin || allowedOrigins.some(allowed => origin.startsWith(allowed))) {
-//       callback(null, true);
-//     } else {
-//       callback(new Error('Not allowed by CORS'));
-//     }
-//   },
-//   credentials: true,
-//   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-//   allowedHeaders: ['Content-Type', 'Authorization']
-// }));
-
 app.use(cors({
   origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
-    
-    if (allowedOrigins.includes(origin)) {
-      return callback(null, true);
+    if (!origin || allowedOrigins.some(allowed => origin.startsWith(allowed))) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
     }
-    
-    const msg = `CORS policy blocked request from origin: ${origin}`;
-    return callback(new Error(msg), false);
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
-  exposedHeaders: ['Content-Length', 'X-Request-ID']
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 // Handle preflight requests
@@ -113,18 +83,6 @@ const transporter = nodemailer.createTransport({
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,
     },
-});
-
-
-
-// Health check endpoint
-app.get('/api/health', (req, res) => {
-  res.status(200).json({ status: 'healthy' });
-});
-
-// Explicit root route
-app.get('/', (req, res) => {
-  res.send('Backend is running');
 });
 
 // Enhanced Contact Form Endpoint with CORS headers
