@@ -92,10 +92,13 @@ const handleSubmit = async (e) => {
   setIsSubmitting(true);
 
   try {
-    // Use relative path for production, absolute for development
-    const apiUrl = process.env.NODE_ENV === 'production' 
-      ? '/api/contact' 
-      : 'http://localhost:5000/api/contact';
+    // Determine API URL based on environment
+    let apiUrl;
+    if (window.location.hostname === 'localhost') {
+      apiUrl = 'http://localhost:5000/api/contact';
+    } else {
+      apiUrl = '/api/contact';
+    }
 
     const response = await fetch(apiUrl, {
       method: 'POST',
@@ -103,24 +106,15 @@ const handleSubmit = async (e) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(formData),
-      credentials: 'include' // Only if you need to send cookies
     });
 
-    // First check if the response is JSON
-    const contentType = response.headers.get('content-type');
-    let data;
-
-    if (contentType && contentType.includes('application/json')) {
-      data = await response.json();
-    } else {
-      const text = await response.text();
-      throw new Error(`Unexpected response: ${text.substring(0, 100)}`);
-    }
-
+    // Handle response
     if (!response.ok) {
-      throw new Error(data.message || 'Request failed');
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
     }
 
+    const data = await response.json();
     toast.success(data.message);
     setFormData({
       name: '',

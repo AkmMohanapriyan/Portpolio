@@ -12,7 +12,7 @@
   "routes": [
     {
       "src": "/api/contact",
-      "dest": "Back-End/server.js",
+      "dest": "/Back-End/server.js",
       "methods": ["POST", "OPTIONS"],
       "headers": {
         "Access-Control-Allow-Origin": "*",

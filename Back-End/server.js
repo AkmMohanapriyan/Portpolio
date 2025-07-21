@@ -12,8 +12,8 @@ const app = express();
 const allowedOrigins = [
   'http://localhost:5173', 
   'http://localhost:5174',
-  'https://kirushnarmohanapriyan-ot6mnetrk-akm-mohanapriyans-projects.vercel.app',
-  'https://kirushnarmohanapriyan.vercel.app' // Add your production domain if different
+  'https://kirushnarmohanapriyan.*.vercel.app', // Wildcard for all preview deployments
+  'https://kirushnarmohanapriyan.vercel.app' // Your production domain
 ];
 
 app.use(cors({
@@ -21,11 +21,19 @@ app.use(cors({
     // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
     
-    if (allowedOrigins.indexOf(origin) === -1) {
-      const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
-      return callback(new Error(msg), false);
+    // Check if the origin is in the allowed list or matches the wildcard pattern
+    if (allowedOrigins.some(allowed => {
+      if (allowed.includes('*')) {
+        const regex = new RegExp(allowed.replace('*', '.*'));
+        return regex.test(origin);
+      }
+      return allowed === origin;
+    })) {
+      return callback(null, true);
     }
-    return callback(null, true);
+    
+    const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+    return callback(new Error(msg), false);
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
@@ -74,12 +82,99 @@ const transporter = nodemailer.createTransport({
 });
 
 // Enhanced Contact Form Endpoint with CORS headers
+// app.post('/api/contact', async (req, res) => {
+//     try {
+//         const { name, email, subject, message } = req.body;
+
+//         // Validate input
+//         if (!name || !email || !message) {
+//             return res.status(400).json({
+//                 success: false,
+//                 message: 'Please fill in all required fields'
+//             });
+//         }
+
+//         // Save to database
+//         const newContact = new Contact({ name, email, subject, message });
+//         await newContact.save();
+
+//         // Email options for admin notification
+//         const adminMailOptions = {
+//             from: process.env.EMAIL_USER,
+//             to: process.env.ADMIN_EMAIL || process.env.EMAIL_USER, // Fallback to sender if ADMIN_EMAIL not set
+//             subject: `New Contact Form Submission: ${subject || 'No Subject'}`,
+//             text: `
+//         You have a new contact form submission:
+        
+//         Name: ${name}
+//         Email: ${email}
+//         Subject: ${subject || 'Not specified'}
+//         Message: ${message}
+        
+//         Received at: ${new Date().toLocaleString()}
+//       `,
+//             html: `
+//         <h2>New Contact Form Submission</h2>
+//         <p><strong>Name:</strong> ${name}</p>
+//         <p><strong>Email:</strong> ${email}</p>
+//         <p><strong>Subject:</strong> ${subject || 'Not specified'}</p>
+//         <p><strong>Message:</strong></p>
+//         <p>${message.replace(/\n/g, '<br>')}</p>
+//         <p><em>Received at: ${new Date().toLocaleString()}</em></p>
+//       `
+//         };
+
+//         // Email options for user confirmation
+//         const userMailOptions = {
+//             from: process.env.EMAIL_USER,
+//             to: email,
+//             subject: 'Thank you for contacting us',
+//             text: `Dear ${name},\n\nThank you for your message. We have received your inquiry and will get back to you shortly.\n\nBest regards,\n${process.env.COMPANY_NAME || 'Our Team'}`,
+//             html: `
+//         <h2>Thank you for contacting us</h2>
+//         <p>Dear ${name},</p>
+//         <p>Thank you for your message. We have received your inquiry and will get back to you shortly.</p>
+//         <p>Best regards,<br>${process.env.COMPANY_NAME || 'Our Team'}</p>
+//       `
+//         };
+
+//         // Send both emails
+//         await transporter.sendMail(adminMailOptions);
+//         await transporter.sendMail(userMailOptions);
+
+//         res.status(200).json({
+//             success: true,
+//             message: 'Message sent successfully!'
+//         });
+
+//     } catch (error) {
+//         console.error('Error processing contact form:', error);
+
+//         // Differentiate between validation errors and server errors
+//         if (error.name === 'ValidationError') {
+//             return res.status(400).json({
+//                 success: false,
+//                 message: error.message
+//             });
+//         }
+
+//         res.status(500).json({
+//             success: false,
+//             message: 'Server error. Please try again later.'
+//         });
+//     }
+// });
+
+// Enhanced Contact Form Endpoint with CORS headers and improved logging
 app.post('/api/contact', async (req, res) => {
     try {
+        console.log('Received contact form submission:', req.body);
+        
         const { name, email, subject, message } = req.body;
 
         // Validate input
         if (!name || !email || !message) {
+            console.log('Validation failed - missing required fields');
             return res.status(400).json({
                 success: false,
                 message: 'Please fill in all required fields'
@@ -87,33 +182,26 @@ app.post('/api/contact', async (req, res) => {
         }
 
         // Save to database
+        console.log('Saving contact to database...');
         const newContact = new Contact({ name, email, subject, message });
         await newContact.save();
+        console.log('Contact saved successfully');
 
         // Email options for admin notification
         const adminMailOptions = {
             from: process.env.EMAIL_USER,
-            to: process.env.ADMIN_EMAIL || process.env.EMAIL_USER, // Fallback to sender if ADMIN_EMAIL not set
+            to: process.env.ADMIN_EMAIL || process.env.EMAIL_USER,
             subject: `New Contact Form Submission: ${subject || 'No Subject'}`,
-            text: `
-        You have a new contact form submission:
-        
-        Name: ${name}
-        Email: ${email}
-        Subject: ${subject || 'Not specified'}
-        Message: ${message}
-        
-        Received at: ${new Date().toLocaleString()}
-      `,
+            text: `You have a new contact form submission:\n\nName: ${name}\nEmail: ${email}\nSubject: ${subject || 'Not specified'}\nMessage: ${message}\n\nReceived at: ${new Date().toLocaleString()}`,
             html: `
-        <h2>New Contact Form Submission</h2>
-        <p><strong>Name:</strong> ${name}</p>
-        <p><strong>Email:</strong> ${email}</p>
-        <p><strong>Subject:</strong> ${subject || 'Not specified'}</p>
-        <p><strong>Message:</strong></p>
-        <p>${message.replace(/\n/g, '<br>')}</p>
-        <p><em>Received at: ${new Date().toLocaleString()}</em></p>
-      `
+                <h2>New Contact Form Submission</h2>
+                <p><strong>Name:</strong> ${name}</p>
+                <p><strong>Email:</strong> ${email}</p>
+                <p><strong>Subject:</strong> ${subject || 'Not specified'}</p>
+                <p><strong>Message:</strong></p>
+                <p>${message.replace(/\n/g, '<br>')}</p>
+                <p><em>Received at: ${new Date().toLocaleString()}</em></p>
+            `
         };
 
         // Email options for user confirmation
@@ -123,16 +211,18 @@ app.post('/api/contact', async (req, res) => {
             subject: 'Thank you for contacting us',
             text: `Dear ${name},\n\nThank you for your message. We have received your inquiry and will get back to you shortly.\n\nBest regards,\n${process.env.COMPANY_NAME || 'Our Team'}`,
             html: `
-        <h2>Thank you for contacting us</h2>
-        <p>Dear ${name},</p>
-        <p>Thank you for your message. We have received your inquiry and will get back to you shortly.</p>
-        <p>Best regards,<br>${process.env.COMPANY_NAME || 'Our Team'}</p>
-      `
+                <h2>Thank you for contacting us</h2>
+                <p>Dear ${name},</p>
+                <p>Thank you for your message. We have received your inquiry and will get back to you shortly.</p>
+                <p>Best regards,<br>${process.env.COMPANY_NAME || 'Our Team'}</p>
+            `
         };
 
         // Send both emails
+        console.log('Sending emails...');
         await transporter.sendMail(adminMailOptions);
         await transporter.sendMail(userMailOptions);
+        console.log('Emails sent successfully');
 
         res.status(200).json({
             success: true,
@@ -141,21 +231,33 @@ app.post('/api/contact', async (req, res) => {
 
     } catch (error) {
         console.error('Error processing contact form:', error);
-
+        
         // Differentiate between validation errors and server errors
         if (error.name === 'ValidationError') {
+            console.error('Validation error:', error.message);
             return res.status(400).json({
                 success: false,
                 message: error.message
             });
         }
 
+        // Handle email sending errors specifically
+        if (error.code === 'EAUTH' || error.code === 'EENVELOPE') {
+            console.error('Email sending error:', error.message);
+            return res.status(500).json({
+                success: false,
+                message: 'Error sending confirmation email. Please try again later.'
+            });
+        }
+
+        console.error('Unexpected server error:', error);
         res.status(500).json({
             success: false,
             message: 'Server error. Please try again later.'
         });
     }
 });
+
 
 // Start server
 const PORT = process.env.PORT || 5000;
