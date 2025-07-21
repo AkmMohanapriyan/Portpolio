@@ -92,13 +92,11 @@ const handleSubmit = async (e) => {
   setIsSubmitting(true);
 
   try {
-    // Determine API URL based on environment
-    let apiUrl;
-    if (window.location.hostname === 'localhost') {
-      apiUrl = 'http://localhost:5000/api/contact';
-    } else {
-      apiUrl = '/api/contact';
-    }
+    // Determine the correct API URL
+    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    const apiUrl = isLocalhost 
+      ? 'http://localhost:5000/api/contact' 
+      : 'https://kirushnarmohanapriyan.vercel.app/api/contact';
 
     const response = await fetch(apiUrl, {
       method: 'POST',
@@ -108,10 +106,8 @@ const handleSubmit = async (e) => {
       body: JSON.stringify(formData),
     });
 
-    // Handle response
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
 
     const data = await response.json();
@@ -130,7 +126,7 @@ const handleSubmit = async (e) => {
   }
 };
 
-
+  
   useEffect(() => {
     // Set current year in footer
     document.getElementById('year').textContent = new Date().getFullYear();

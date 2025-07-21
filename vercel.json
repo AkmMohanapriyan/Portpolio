@@ -3,26 +3,13 @@
   "builds": [
     {
       "src": "Back-End/server.js",
-      "use": "@vercel/node",
-      "config": {
-        "includeFiles": ["Back-End/**/*"]
-      }
+      "use": "@vercel/node"
     }
   ],
   "routes": [
     {
-      "src": "/api/contact",
-      "dest": "/Back-End/server.js",
-      "methods": ["POST", "OPTIONS"],
-      "headers": {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "POST, OPTIONS",
-        "Access-Control-Allow-Headers": "Content-Type, Authorization"
-      }
-    },
-    {
-      "src": "/api/.*",
-      "status": 404
+      "src": "/api/(.*)",
+      "dest": "/Back-End/server.js"
     }
   ]
 }
