@@ -93,10 +93,13 @@ const handleSubmit = async (e) => {
 
   try {
     // Determine the correct API URL
-    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    const isLocalhost = window.location.hostname === 'localhost' || 
+                       window.location.hostname === '127.0.0.1';
+    
+    // Use relative path in production, absolute in development
     const apiUrl = isLocalhost 
       ? 'http://localhost:5000/api/contact' 
-      : 'https://kirushnarmohanapriyan.vercel.app/api/contact';
+      : '/api/contact';
 
     const response = await fetch(apiUrl, {
       method: 'POST',
@@ -104,10 +107,12 @@ const handleSubmit = async (e) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(formData),
+      credentials: 'include' // Only if you need cookies
     });
 
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
     }
 
     const data = await response.json();

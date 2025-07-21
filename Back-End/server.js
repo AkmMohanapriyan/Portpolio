@@ -10,30 +10,31 @@ const app = express();
 
 // Enhanced Middleware Configuration
 const allowedOrigins = [
-  'http://localhost:5173', 
+  'http://localhost:5173',
   'http://localhost:5174',
-  'https://kirushnarmohanapriyan.*.vercel.app', // Wildcard for all preview deployments
-  'https://kirushnarmohanapriyan.vercel.app' // Your production domain
+  'https://kirushnarmohanapriyan.vercel.app',
+  'https://kirushnarmohanapriyan-*.vercel.app', // Wildcard for all preview deployments
+  'https://kirushnarmohanapriyan-git-*.vercel.app' // For Git branch deployments
 ];
 
 app.use(cors({
   origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
     
-    // Check if the origin is in the allowed list or matches the wildcard pattern
-    if (allowedOrigins.some(allowed => {
+    // Check against allowed origins with wildcard support
+    const originAllowed = allowedOrigins.some(allowed => {
       if (allowed.includes('*')) {
-        const regex = new RegExp(allowed.replace('*', '.*'));
+        const regex = new RegExp('^' + allowed.replace(/\*/g, '.*') + '$');
         return regex.test(origin);
       }
-      return allowed === origin;
-    })) {
+      return origin === allowed;
+    });
+    
+    if (originAllowed) {
       return callback(null, true);
     }
     
-    const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
-    return callback(new Error(msg), false);
+    return callback(new Error('Not allowed by CORS'));
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
