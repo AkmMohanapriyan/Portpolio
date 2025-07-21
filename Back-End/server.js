@@ -8,11 +8,11 @@ dotenv.config();
 
 const app = express();
 
-const allowedOrigins = [
-  'http://localhost:5173',
-  'https://kirushnarmohanapriyan-cy6pwg79j-akm-mohanapriyans-projects.vercel.app',
-  'https://kirushnarmohanapriyan.vercel.app' // Add your production domain
-];
+// const allowedOrigins = [
+//   'http://localhost:5173',
+//   'https://kirushnarmohanapriyan-cy6pwg79j-akm-mohanapriyans-projects.vercel.app',
+//   'https://kirushnarmohanapriyan.vercel.app' // Add your production domain
+// ];
 
 // Enhanced Middleware Configuration
 // app.use(cors({
@@ -31,17 +31,55 @@ const allowedOrigins = [
 //   allowedHeaders: ['Content-Type', 'Authorization']
 // }));
 
+// app.use(cors({
+//   origin: function (origin, callback) {
+//     if (!origin || allowedOrigins.some(allowed => origin.startsWith(allowed))) {
+//       callback(null, true);
+//     } else {
+//       callback(new Error('Not allowed by CORS'));
+//     }
+//   },
+//   credentials: true,
+//   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+//   allowedHeaders: ['Content-Type', 'Authorization']
+// }));
+
+
+
+
+const allowedOrigins = [
+  'http://localhost:5173', // Local development
+  'https://kirushnarmohanapriyan.vercel.app', // Production frontend
+  /^https:\/\/kirushnarmohanapriyan-.*-akm-mohanapriyans-projects\.vercel\.app$/, // Preview deployments
+  /^https:\/\/kirushnarmohanapriyan-[a-z0-9]+\.vercel\.app$/ // Direct deployments
+];
+
 app.use(cors({
   origin: function (origin, callback) {
-    if (!origin || allowedOrigins.some(allowed => origin.startsWith(allowed))) {
-      callback(null, true);
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    // Check against allowed origins
+    const isAllowed = allowedOrigins.some(allowed => {
+      if (typeof allowed === 'string') {
+        return origin === allowed;
+      } else if (allowed instanceof RegExp) {
+        return allowed.test(origin);
+      }
+      return false;
+    });
+
+    if (isAllowed) {
+      return callback(null, true);
     } else {
-      callback(new Error('Not allowed by CORS'));
+      const msg = `The CORS policy for this site does not allow access from ${origin}`;
+      return callback(new Error(msg), false);
     }
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
+  exposedHeaders: ['Content-Range', 'X-Content-Range']
 }));
 
 // Handle preflight requests

@@ -56,7 +56,8 @@ const response = await fetch('https://kirushnarmohanapriyan.vercel.app/api/conta
     'Content-Type': 'application/json',
     'Accept': 'application/json'
   },
-  body: JSON.stringify(formData)
+  body: JSON.stringify(formData),
+  credentials: 'same-origin' // Or 'include' if using cookies
 });
 
       // First check if the response is JSON
