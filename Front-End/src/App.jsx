@@ -751,7 +751,7 @@ Mohanapriyan`;
       <section id="education" className="section">
         <div className="container-fluid">
           <h2 className="section-title animate-in">My Education Journey<span></span></h2>
-          <div className="row">
+          <div className="row text-center">
             <div className="col-lg-4 col-md-6 mb-4">
               <div className="education-card animate-in">
                 <div className="education-icon">
@@ -768,9 +768,9 @@ Mohanapriyan`;
                 <div className="education-icon">
                   <i className="fas fa-university"></i>
                 </div>
-                <h3>DP IT Campus</h3>
+                <h3>Web Development</h3>
                 <p className='text-justify'>
-                  Attended DP IT Campus where I gained foundational knowledge in computer science and information technology principles...
+                  I am proud to announce that I have successfully completed the Web Development Certification Course from DP Education IT Campus!...
                 </p>
                 <button className="btn btn-view" onClick={toggleWebDevModal}>View Full Details</button>
               </div>
@@ -874,8 +874,8 @@ Mohanapriyan`;
               </button>
 
               <h2>Web Development Certification Course</h2>
-              <p className="modal-subtitle">DP IT Campus (Online Program)</p>
-              <p className="modal-subtitle">Full Stack Development with Modern Tools</p>
+              <p className="modal-subtitle">DP Education IT Campus (Online Program)</p>
+              <p className="modal-subtitle text-justify">I am proud to announce that I have successfully completed the Web Development Certification Course from DP IT Campus! This comprehensive program has equipped me with essential skills in modern web development, including frontend development where I mastered HTML5, CSS3, and JavaScript (ES6+) to build responsive, interactive websites. I gained hands-on experience with backend integration using Airtable as a database solution and learned mobile app development to create cross-platform apps with Thunkable. Through practical full-stack projects, I developed end-to-end applications that combine frontend, backend, and mobile components, giving me valuable real-world development experience.</p>
 
               <div className="modal-description">
                 <h4 className="modal-section-title">Course Overview</h4>

@@ -570,6 +570,29 @@ a {
     }
 }
 
+@media (max-width: 767.98px) {
+    #education .container-fluid {
+        padding: 2px 20px;
+    }
+
+    .education-card {
+        padding: 20px;
+    }
+
+    .education-icon {
+        font-size: 2rem;
+    }
+
+    .education-card h3 {
+        font-size: 1.3rem;
+    }
+
+}
+
+
+
+
+
 
 /* Services Section */
 #services {
@@ -963,196 +986,6 @@ footer .container-fluid {
 
 
 
-
-
-/* Education Section Popup */
-
-/* .modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.7);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-  overflow-y: auto;
-  padding: 20px;
-}
-
-.modal-content {
-  background: black;
-  border-radius: 10px;
-  padding: 30px;
-  max-width: 800px;
-  width: 90%;
-  max-height: 80vh;
-  overflow-y: auto;
-  position: relative;
-  box-shadow: 0 5px 25px rgba(0, 0, 0,0.2);
-}
-
-.modal-close {
-  position: absolute;
-  top: 15px;
-  right: 15px;
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  cursor: pointer;
-  color: #666;
-}
-
-.modal-content h2 {
-  color: #3498db;
-  margin-bottom: 10px;
-  font-size: 1.8rem;
-}
-
-.modal-subtitle {
-  color: #666;
-  font-style: italic;
-  margin-bottom: 20px;
-}
-
-.modal-description {
-  margin-bottom: 30px;
-  line-height: 1.6;
-}
-
-.modal-section-title {
-  color: #3498db;
-  margin: 25px 0 15px;
-  font-size: 1.4rem;
-  border-bottom: 2px solid #eee;
-  padding-bottom: 8px;
-} */
-
-/* Module Accordion */
-
-/* .module-accordion {
-  margin-bottom: 20px;
-}
-
-.module-item {
-  margin-bottom: 10px;
-  border: 1px solid #eee;
-  border-radius: 5px;
-  overflow: hidden;
-}
-
-.module-header {
-  padding: 15px;
-  background: #f8f9fa;
-  cursor: pointer;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  transition: background 0.3s ease;
-}
-
-.module-header:hover {
-  background: #e9ecef;
-}
-
-.module-header.active {
-  background: #e9ecef;
-}
-
-.module-header h4 {
-  margin: 0;
-  font-size: 1.1rem;
-  color: #333;
-}
-
-.module-content {
-  padding: 15px;
-  background: white;
-}
-
-.module-content ul {
-  padding-left: 20px;
-  margin: 0;
-}
-
-.module-content li {
-  margin-bottom: 8px;
-  line-height: 1.5;
-} */
-
-/* Lists */
-
-/* .career-pathways,
-.learning-outcomes {
-  padding-left: 20px;
-  margin-bottom: 20px;
-}
-
-.career-pathways li,
-.learning-outcomes li {
-  margin-bottom: 8px;
-  line-height: 1.5;
-} */
-
-/* Certificate Images */
-
-/* .certificate-images {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-  justify-content: center;
-  margin-top: 30px;
-}
-
-.certificate-img {
-  max-width: 100%;
-  height: auto;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
-} */
-
-/* Responsive */
-
-/* @media (max-width: 768px) {
-  .modal-content {
-    padding: 20px;
-  }
-  
-  .section-title {
-    font-size: 2rem;
-  }
-  
-  .education-card {
-    padding: 20px;
-  }
-  
-  .certificate-images {
-    flex-direction: column;
-    align-items: center;
-  }
-}
-
-@media (max-width: 576px) {
-  .section {
-    padding: 60px 0;
-  }
-  
-  .section-title {
-    font-size: 1.8rem;
-    margin-bottom: 30px;
-  }
-  
-  .modal-content h2 {
-    font-size: 1.5rem;
-  }
-  
-  .module-header h4 {
-    font-size: 1rem;
-  }
-} */
 
 
 
