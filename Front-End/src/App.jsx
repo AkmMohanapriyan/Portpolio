@@ -99,10 +99,7 @@ Mohanapriyan`;
         toast.success(
           <div style={{
             fontFamily: 'system-ui, sans-serif',
-            padding: '12px',
-            background: '#f0f9eb',
-            color: '#2e7d32',
-            borderRadius: '4px'
+            color: '#000000'
           }}>
             <p style={{ margin: '0 0 8px 0', fontWeight: '600' }}>Message sent successfully</p>
             <p style={{ margin: 0, fontSize: '14px' }}>Confirmation sent to {formData.email}</p>
@@ -129,13 +126,11 @@ Mohanapriyan`;
         <div style={{
           fontFamily: 'system-ui, sans-serif',
           padding: '12px',
-          color: '#d32f2f',
           borderRadius: '4px'
         }}>
           <p style={{ margin: '0 0 8px 0', fontWeight: '600' }}>Failed to send message</p>
           <p style={{ margin: 0, fontSize: '14px' }}>
             <a href={mailtoLink} style={{
-              color: '#1976d2',
               textDecoration: 'none',
               fontWeight: '500'
             }}>
