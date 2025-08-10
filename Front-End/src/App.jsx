@@ -145,7 +145,6 @@ Mohanapriyan`;
     }
   };
 
-
   useEffect(() => {
     // Set current year in footer
     document.getElementById('year').textContent = new Date().getFullYear();
@@ -292,9 +291,6 @@ Mohanapriyan`;
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-
-
-
   // Education Popup 
 
   const [showModal, setShowModal] = useState(false);
@@ -335,6 +331,7 @@ Mohanapriyan`;
     "Mobile: Thunkable (Drag-and-drop app builder)",
     "Version Control: GitHub Basics"
   ];
+
 
 
   // web development modules
@@ -547,6 +544,123 @@ Mohanapriyan`;
     }
   ];
 
+  // Full Stack Development Modules
+
+  const [showFullStackModal, setShowFullStackModal] = useState(false);
+
+  const FSModules = [
+    {
+      title: "1. Ubuntu & Terminal",
+      content: [
+        "Introduction to operating systems and Linux environments",
+        "Mastering terminal commands for efficient development workflows",
+        "File system navigation and permission management"
+      ]
+    },
+    {
+      title: "2. Introduction to Programming",
+      content: [
+        "Fundamentals of computational thinking and problem-solving",
+        "Core programming concepts (variables, logic, control flow)",
+        "Algorithm design principles"
+      ]
+    },
+    {
+      title: "3. HTML Fundamentals",
+      content: [
+        "Semantic HTML5 document structure",
+        "Forms, multimedia embedding, and accessibility best practices",
+        "SEO optimization techniques"
+      ]
+    },
+    {
+      title: "4. Git & GitHub",
+      content: [
+        "Version control system fundamentals",
+        "Branching strategies and collaborative workflows",
+        "Open-source contribution practices"
+      ]
+    },
+    {
+      title: "5. CSS & Responsive Design",
+      content: [
+        "Core Concepts: Box model, specificity, cascade",
+        "Layout Systems: Flexbox, Grid, and positioning",
+        "Styling Techniques: Animations, transitions, variables",
+        "Responsive Design: Media queries, mobile-first approach",
+        "UI Components: Navigation bars, forms, dropdowns"
+      ]
+    },
+    {
+      title: "6. JavaScript (ES6+)",
+      content: [
+        "Fundamentals: Data types, functions, scope",
+        "DOM Manipulation: Event handling, dynamic content",
+        "Modern Features: Arrow functions, destructuring, async/await",
+        "Data Structures: Arrays, objects, array methods"
+      ]
+    },
+    {
+      title: "7. Database Systems",
+      content: [
+        "MySQL: Relational database design, SQL queries",
+        "MongoDB: NoSQL concepts, document-based storage",
+        "CRUD Operations in both database systems"
+      ]
+    },
+    {
+      title: "8. React.js (Frontend Framework)",
+      content: [
+        "Component-based architecture",
+        "State management with Hooks (useState, useEffect)",
+        "Routing with React Router DOM",
+        "Props, conditional rendering, and lifecycle methods"
+      ]
+    },
+    {
+      title: "9. Node.js (Backend Runtime)",
+      content: [
+        "JavaScript on the server",
+        "Module system and NPM ecosystem",
+        "Building RESTful APIs"
+      ]
+    },
+    {
+      title: "10. Express.js (Backend Framework)",
+      content: [
+        "Middleware concepts",
+        "Routing and request handling",
+        "Database integration",
+        "Authentication implementation"
+      ]
+    }
+  ];
+
+
+  const FSlearningOutcomes = [
+    "Develop responsive, interactive web applications",
+    "Implement both SQL and NoSQL database solutions",
+    "Build modern UIs with React.js",
+    "Create secure backend services with Node/Express",
+    "Deploy full-stack applications"
+  ];
+
+  const FStoolsCovered = [
+    "Frontend: VS Code, Chrome DevTools",
+    "Backend: Postman, MongoDB Compass",
+    "Version Control: Git/GitHub",
+    "Deployment: Vercel, Render, Netlify"
+  ];
+
+
+  const toggleFullStackModal = () => {
+    setShowFullStackModal(!showFullStackModal);
+    if (!showFullStackModal) {
+      setActiveModule(null);
+    }
+  };
+
+
   return (
     <>
       {/* Navbar */}
@@ -741,7 +855,6 @@ Mohanapriyan`;
         </div>
       </section>
 
-
       {/* New Education Section */}
       <section id="education" className="section">
         <div className="container-fluid">
@@ -779,7 +892,7 @@ Mohanapriyan`;
                 <p className='text-justify'>
                   Mastered full stack development including front-end technologies like React and back-end systems with Node.js and databases...
                 </p>
-                <button className="btn btn-view">View Full Details</button>
+                <button className="btn btn-view" onClick={toggleFullStackModal}>View Full Details</button>
               </div>
             </div>
           </div>
@@ -858,8 +971,6 @@ Mohanapriyan`;
         )}
 
 
-        {/* Web Development Modules */}
-
         {/* Web Development Modal */}
         {showWebDevModal && (
           <div className="modal-overlay" onClick={toggleWebDevModal}>
@@ -930,6 +1041,67 @@ Mohanapriyan`;
             </div>
           </div>
         )}
+
+
+        {/* Full Stack Development Modules */}
+        {showFullStackModal && (
+          <div className="modal-overlay" onClick={toggleFullStackModal}>
+            <div className="modal-content" onClick={e => e.stopPropagation()}>
+              <button className="modal-close" onClick={toggleFullStackModal}>
+                <i className="fas fa-times"></i>
+              </button>
+
+              <h2>Full Stack Web Development Certification</h2>
+              <p className="modal-subtitle">Comprehensive Training Program Covering Modern Web Technologies</p>
+
+              <div className="modal-description">
+                <h4 className="modal-section-title">Course Overview</h4>
+                <p className='text-justify'>
+                  This intensive program provides end-to-end training in full stack web development, equipping students with practical skills in both frontend and backend technologies. The curriculum progresses from fundamental concepts to advanced frameworks, ensuring graduates can build complete, production-ready web applications.
+                </p>
+              </div>
+
+              <h3 className="modal-section-title">Detailed Curriculum</h3>
+              <div className="module-accordion">
+                {FSModules.map((module, index) => (
+                  <div key={index} className="module-item">
+                    <div
+                      className={`module-header ${activeModule === index ? 'active' : ''}`}
+                      onClick={() => toggleModule(index)}
+                    >
+                      <h4>{module.title}</h4>
+                      <i className={`fas ${activeModule === index ? 'fa-minus' : 'fa-plus'}`}></i>
+                    </div>
+                    {activeModule === index && (
+                      <div className="module-content">
+                        <ul>
+                          {module.content.map((item, i) => (
+                            <li key={i}>{item}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              <h3 className="modal-section-title">Learning Outcomes</h3>
+              <ul className="learning-outcomes">
+                {FSlearningOutcomes.map((outcome, index) => (
+                  <li key={index}>{outcome}</li>
+                ))}
+              </ul>
+
+              <h3 className="modal-section-title">Tools & Technologies</h3>
+              <ul className="tools-covered">
+                {FStoolsCovered.map((tool, index) => (
+                  <li key={index}>{tool}</li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        )}
+
 
       </section>
 
